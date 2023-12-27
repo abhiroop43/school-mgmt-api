@@ -5,6 +5,8 @@ import dev.abhiroopsantra.schoolmgmtapi.dto.AuthenticationResponse;
 import dev.abhiroopsantra.schoolmgmtapi.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -32,8 +34,8 @@ public class AuthenticationController {
 
     // TODO: Use standardized HTTP status codes
     @PostMapping("/authenticate")
-    public String createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest,
-                                            HttpServletResponse response)
+    public ResponseEntity<AuthenticationResponse> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest,
+                                                                            HttpServletResponse response)
             throws IOException {
         try {
             authenticationManager.authenticate(
@@ -42,16 +44,26 @@ public class AuthenticationController {
                             authenticationRequest.getPassword()
                     ));
         } catch (BadCredentialsException ex) {
-            throw new BadCredentialsException("Incorrect username or password");
-        } catch (DisabledException ex) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "User is not created");
-            return null;
+//            throw new BadCredentialsException("Incorrect username or password");
+            return new ResponseEntity<>(
+                    new AuthenticationResponse(null, "1", "Incorrect username or password"),
+                    HttpStatus.BAD_REQUEST
+            );
+        } catch (Exception ex) {
+//            response.sendError(HttpServletResponse.SC_NOT_FOUND, "User is not created");
+            return new ResponseEntity<>(
+                    new AuthenticationResponse(null, "2", "An error occurred while authenticating"),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
 
-        final String jwt = jwtUtil.generateToken(userDetails.getUsername());
+        String jwt = jwtUtil.generateToken(userDetails.getUsername());
 
-        return jwt;
+        return new ResponseEntity<>(
+                new AuthenticationResponse(jwt, "0", "Success"),
+                HttpStatus.OK
+        );
     }
 }
