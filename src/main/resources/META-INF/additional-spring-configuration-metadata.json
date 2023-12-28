@@ -4,5 +4,11 @@
       "name": "admin.password",
       "type": "java.lang.String",
       "description": "Application Admin password."
-  }
-] }
+    },
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "Secret to be used to generate the JWT."
+    }
+  ]
+}
