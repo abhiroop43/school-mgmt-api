@@ -1,15 +1,16 @@
 package dev.abhiroopsantra.schoolmgmtapi.controllers;
 
+import dev.abhiroopsantra.schoolmgmtapi.dto.Auth.UserDto;
 import dev.abhiroopsantra.schoolmgmtapi.dto.AuthenticationRequest;
 import dev.abhiroopsantra.schoolmgmtapi.dto.AuthenticationResponse;
+import dev.abhiroopsantra.schoolmgmtapi.entities.User;
+import dev.abhiroopsantra.schoolmgmtapi.repositories.UserRepository;
 import dev.abhiroopsantra.schoolmgmtapi.utils.JwtUtil;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,53 +18,84 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
+import java.util.HashMap;
+import java.util.Optional;
 
 @RestController
 public class AuthenticationController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
+
+    private final UserRepository userRepository;
+
+    private final ModelMapper modelMapper;
+
+    public AuthenticationController(AuthenticationManager authenticationManager,
+                                    UserDetailsService userDetailsService,
+                                    JwtUtil jwtUtil,
+                                    UserRepository userRepository,
+                                    ModelMapper modelMapper) {
+        this.authenticationManager = authenticationManager;
+        this.userDetailsService = userDetailsService;
+        this.jwtUtil = jwtUtil;
+        this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
+    }
 
 
-    // TODO: Use standardized HTTP status codes
-    @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest,
-                                                                            HttpServletResponse response)
-            throws IOException {
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> createAuthenticationToken(
+            @RequestBody AuthenticationRequest authenticationRequest) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             authenticationRequest.getEmail(),
                             authenticationRequest.getPassword()
                     ));
-        } catch (BadCredentialsException ex) {
-//            throw new BadCredentialsException("Incorrect username or password");
+
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
+            Optional<User> user = userRepository.findFirstByEmail(authenticationRequest.getEmail());
+
+            final String jwt = jwtUtil.generateToken(userDetails.getUsername());
+
+            HashMap<String, Object> responseData = new HashMap<>();
+            responseData.put("token", jwt);
+            if (user.isPresent()) {
+                responseData.put("user", modelMapper.map(user.get(), UserDto.class));
+            } else {
+                responseData.put("user", null);
+            }
+
             return new ResponseEntity<>(
-                    new AuthenticationResponse(null, "1", "Incorrect username or password"),
+                    new AuthenticationResponse(
+                            responseData,
+                            "0",
+                            "Success"),
+                    HttpStatus.OK
+            );
+
+        } catch (BadCredentialsException ex) {
+            return new ResponseEntity<>(
+                    new AuthenticationResponse(
+                            null,
+                            "1",
+                            "Incorrect username or password"),
                     HttpStatus.BAD_REQUEST
             );
         } catch (Exception ex) {
-//            response.sendError(HttpServletResponse.SC_NOT_FOUND, "User is not created");
             return new ResponseEntity<>(
-                    new AuthenticationResponse(null, "2", "An error occurred while authenticating"),
+                    new AuthenticationResponse(
+                            null,
+                            "2",
+                            "An error occurred while authenticating"),
                     HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
 
-        String jwt = jwtUtil.generateToken(userDetails.getUsername());
-
-        return new ResponseEntity<>(
-                new AuthenticationResponse(jwt, "0", "Success"),
-                HttpStatus.OK
-        );
     }
 }

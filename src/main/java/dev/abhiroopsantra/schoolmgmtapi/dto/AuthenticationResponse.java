@@ -1,12 +1,14 @@
 package dev.abhiroopsantra.schoolmgmtapi.dto;
 
+import java.util.HashMap;
+
 public class AuthenticationResponse {
-    public String jwt;
+    public HashMap<String, Object> data;
     public String errCode;
     public String errMsg;
 
-    public AuthenticationResponse(String jwt, String errCode, String errMsg) {
-        this.jwt = jwt;
+    public AuthenticationResponse(HashMap<String, Object> data, String errCode, String errMsg) {
+        this.data = data;
         this.errCode = errCode;
         this.errMsg = errMsg;
     }
