@@ -3,12 +3,11 @@ package dev.abhiroopsantra.schoolmgmtapi.controllers;
 import dev.abhiroopsantra.schoolmgmtapi.dto.ApiResponse;
 import dev.abhiroopsantra.schoolmgmtapi.dto.UserDto;
 import dev.abhiroopsantra.schoolmgmtapi.services.admin.AdminService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 
@@ -19,7 +18,7 @@ import java.util.HashMap;
         this.adminService = adminService;
     }
 
-    @PostMapping("/student") public ResponseEntity<ApiResponse> addStudent(@RequestBody UserDto studentDto) {
+    @PostMapping("/students") public ResponseEntity<ApiResponse> addStudent(@RequestBody UserDto studentDto) {
         try {
             UserDto createdStudent = adminService.postStudent(studentDto);
 
@@ -38,5 +37,22 @@ import java.util.HashMap;
             return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    @GetMapping("/students") public ResponseEntity<ApiResponse> getStudentsList(Pageable pageable) {
+        try {
+            Page<UserDto>           students     = adminService.getStudents(pageable);
+            HashMap<String, Object> responseData = new HashMap<>();
+            responseData.put("students", students.getContent());
+            responseData.put("currentPage", students.getNumber());
+            responseData.put("totalItems", students.getTotalElements());
+            responseData.put("totalPages", students.getTotalPages());
+
+            return new ResponseEntity<>(
+                    new ApiResponse(responseData, "0", "Students fetched successfully"), HttpStatus.OK);
+        }
+        catch (Exception ex) {
+            return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

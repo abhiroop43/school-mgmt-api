@@ -7,6 +7,8 @@ import dev.abhiroopsantra.schoolmgmtapi.repositories.UserRepository;
 import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -57,5 +59,10 @@ import java.util.Optional;
 
         User createdUser = userRepository.save(student);
         return modelMapper.map(createdUser, UserDto.class);
+    }
+
+    @Override public Page<UserDto> getStudents(Pageable pageable) {
+        Page<User> students = userRepository.findAllByRole(UserRole.STUDENT, pageable);
+        return students.map(student -> modelMapper.map(student, UserDto.class));
     }
 }
