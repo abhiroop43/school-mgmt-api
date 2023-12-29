@@ -56,11 +56,12 @@ import java.util.Optional;
             final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
             Optional<User>    user        = userRepository.findFirstByEmail(authenticationRequest.getEmail());
 
-            final String jwt = jwtUtil.generateToken(userDetails.getUsername());
-
             HashMap<String, Object> responseData = new HashMap<>();
-            responseData.put("token", jwt);
+
             if (user.isPresent()) {
+                final String jwt = jwtUtil.generateToken(user.get());
+
+                responseData.put("token", jwt);
                 responseData.put("user", modelMapper.map(user.get(), UserDto.class));
             } else {
                 responseData.put("user", null);

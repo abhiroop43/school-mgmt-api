@@ -12,15 +12,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 
-@RestController @RequestMapping("/api/admin") public class AdminController {
+@RestController @RequestMapping("/api/admin") @PreAuthorize("hasAuthority('ADMIN')") public class AdminController {
     private final AdminService adminService;
 
     public AdminController(AdminService adminService) {
         this.adminService = adminService;
     }
 
-    @PreAuthorize("hasRole('ADMIN')") @PostMapping("/students")
-    public ResponseEntity<ApiResponse> addStudent(@RequestBody UserDto studentDto) {
+    @PostMapping("/students") public ResponseEntity<ApiResponse> addStudent(@RequestBody UserDto studentDto) {
         try {
             UserDto createdStudent = adminService.postStudent(studentDto);
 
@@ -41,8 +40,7 @@ import java.util.HashMap;
 
     }
 
-    @PreAuthorize("hasRole('ADMIN')") @GetMapping("/students")
-    public ResponseEntity<ApiResponse> getStudentsList(Pageable pageable) {
+    @GetMapping("/students") public ResponseEntity<ApiResponse> getStudentsList(Pageable pageable) {
         try {
             Page<UserDto>           students     = adminService.getStudents(pageable);
             HashMap<String, Object> responseData = new HashMap<>();
