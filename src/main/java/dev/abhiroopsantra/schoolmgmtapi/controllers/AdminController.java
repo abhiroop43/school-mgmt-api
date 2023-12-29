@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -18,7 +19,8 @@ import java.util.HashMap;
         this.adminService = adminService;
     }
 
-    @PostMapping("/students") public ResponseEntity<ApiResponse> addStudent(@RequestBody UserDto studentDto) {
+    @PreAuthorize("hasRole('ADMIN')") @PostMapping("/students")
+    public ResponseEntity<ApiResponse> addStudent(@RequestBody UserDto studentDto) {
         try {
             UserDto createdStudent = adminService.postStudent(studentDto);
 
@@ -39,7 +41,8 @@ import java.util.HashMap;
 
     }
 
-    @GetMapping("/students") public ResponseEntity<ApiResponse> getStudentsList(Pageable pageable) {
+    @PreAuthorize("hasRole('ADMIN')") @GetMapping("/students")
+    public ResponseEntity<ApiResponse> getStudentsList(Pageable pageable) {
         try {
             Page<UserDto>           students     = adminService.getStudents(pageable);
             HashMap<String, Object> responseData = new HashMap<>();
