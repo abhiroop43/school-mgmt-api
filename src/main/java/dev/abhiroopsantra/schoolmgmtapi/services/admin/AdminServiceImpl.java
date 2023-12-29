@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -64,5 +65,28 @@ import java.util.Optional;
     @Override public Page<UserDto> getStudents(Pageable pageable) {
         Page<User> students = userRepository.findAllByRole(UserRole.STUDENT, pageable);
         return students.map(student -> modelMapper.map(student, UserDto.class));
+    }
+
+    @Override public UserDto updateStudent(Long id, UserDto studentDto) {
+        Optional<User> user = userRepository.findById(id);
+
+        if (user.isEmpty()) {
+            return null;
+        }
+
+        User student = user.get();
+
+        // we only allow updating the following fields of the student
+        student.setName(studentDto.getName());
+        student.setFatherName(studentDto.getFatherName());
+        student.setMotherName(studentDto.getMotherName());
+        student.setAddress(studentDto.getAddress());
+        student.setStudentClass(studentDto.getStudentClass());
+
+        student.setUpdatedAt(new Date());
+        student.setUpdatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        User updatedUser = userRepository.save(student);
+        return modelMapper.map(updatedUser, UserDto.class);
     }
 }

@@ -1,8 +1,9 @@
 package dev.abhiroopsantra.schoolmgmtapi.filters;
 
+import dev.abhiroopsantra.schoolmgmtapi.entities.User;
+import dev.abhiroopsantra.schoolmgmtapi.repositories.UserRepository;
 import dev.abhiroopsantra.schoolmgmtapi.services.jwt.UserDetailsServiceImpl;
 import dev.abhiroopsantra.schoolmgmtapi.utils.JwtUtil;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,17 +20,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Component public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtUtil                jwtUtil;
+    private final UserRepository         userRepository;
 
     public JwtRequestFilter(
-            UserDetailsServiceImpl userDetailsService, JwtUtil jwtUtil
+            UserDetailsServiceImpl userDetailsService, JwtUtil jwtUtil, UserRepository userRepository
                            ) {
         this.userDetailsService = userDetailsService;
         this.jwtUtil            = jwtUtil;
+        this.userRepository     = userRepository;
     }
 
     @Override protected void doFilterInternal(
@@ -45,17 +49,18 @@ import java.util.List;
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UserDetails    userDetails = userDetailsService.loadUserByUsername(username);
+            Optional<User> user        = userRepository.findFirstByEmail(username);
 
-            if (jwtUtil.validateToken(token, userDetails)) {
+
+            if (jwtUtil.validateToken(token, userDetails) && user.isPresent()) {
 
                 Collection<SimpleGrantedAuthority> oldAuthorities
                         = (Collection<SimpleGrantedAuthority>) userDetails.getAuthorities();
 
-                String role = (String) jwtUtil.extractAllClaims(token).get("role");
-
                 // add the role to the existing authorities
-                SimpleGrantedAuthority       authority          = new SimpleGrantedAuthority(role);
+                SimpleGrantedAuthority       authority          = new SimpleGrantedAuthority(
+                        user.get().getRole().toString());
                 List<SimpleGrantedAuthority> updatedAuthorities = new ArrayList<>();
                 updatedAuthorities.add(authority);
                 updatedAuthorities.addAll(oldAuthorities);

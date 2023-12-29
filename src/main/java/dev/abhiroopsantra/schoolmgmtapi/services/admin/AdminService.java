@@ -8,4 +8,6 @@ public interface AdminService {
     UserDto postStudent(UserDto studentDto);
 
     Page<UserDto> getStudents(Pageable pageable);
+
+    UserDto updateStudent(Long id, UserDto studentDto);
 }

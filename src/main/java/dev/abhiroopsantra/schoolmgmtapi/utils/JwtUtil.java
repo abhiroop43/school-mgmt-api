@@ -1,6 +1,5 @@
 package dev.abhiroopsantra.schoolmgmtapi.utils;
 
-import dev.abhiroopsantra.schoolmgmtapi.entities.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -34,7 +33,7 @@ import java.util.function.Function;
         return claimsResolver.apply(claims);
     }
 
-    public Claims extractAllClaims(String token) {
+    private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody();
     }
 
@@ -47,11 +46,9 @@ import java.util.function.Function;
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    public String generateToken(User user) {
+    public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", user.getRole());
-        claims.put("email", user.getEmail());
-        return createToken(claims, user.getEmail());
+        return createToken(claims, username);
     }
 
     private String createToken(Map<String, Object> claims, String username) {

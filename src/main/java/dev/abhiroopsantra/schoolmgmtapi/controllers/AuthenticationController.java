@@ -24,14 +24,10 @@ import java.util.Optional;
 @RestController public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
-
-    private final UserDetailsService userDetailsService;
-
-    private final JwtUtil jwtUtil;
-
-    private final UserRepository userRepository;
-
-    private final ModelMapper modelMapper;
+    private final UserDetailsService    userDetailsService;
+    private final JwtUtil               jwtUtil;
+    private final UserRepository        userRepository;
+    private final ModelMapper           modelMapper;
 
     public AuthenticationController(
             AuthenticationManager authenticationManager, UserDetailsService userDetailsService, JwtUtil jwtUtil,
@@ -59,7 +55,7 @@ import java.util.Optional;
             HashMap<String, Object> responseData = new HashMap<>();
 
             if (user.isPresent()) {
-                final String jwt = jwtUtil.generateToken(user.get());
+                final String jwt = jwtUtil.generateToken(userDetails.getUsername());
 
                 responseData.put("token", jwt);
                 responseData.put("user", modelMapper.map(user.get(), UserDto.class));

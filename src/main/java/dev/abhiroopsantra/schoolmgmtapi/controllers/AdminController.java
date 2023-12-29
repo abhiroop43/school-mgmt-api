@@ -19,6 +19,7 @@ import java.util.HashMap;
         this.adminService = adminService;
     }
 
+    // api method to create a new student
     @PostMapping("/students") public ResponseEntity<ApiResponse> addStudent(@RequestBody UserDto studentDto) {
         try {
             UserDto createdStudent = adminService.postStudent(studentDto);
@@ -40,6 +41,7 @@ import java.util.HashMap;
 
     }
 
+    // api method to list all students
     @GetMapping("/students") public ResponseEntity<ApiResponse> getStudentsList(Pageable pageable) {
         try {
             Page<UserDto>           students     = adminService.getStudents(pageable);
@@ -51,6 +53,29 @@ import java.util.HashMap;
 
             return new ResponseEntity<>(
                     new ApiResponse(responseData, "0", "Students fetched successfully"), HttpStatus.OK);
+        }
+        catch (Exception ex) {
+            return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // api method to update a student
+    @PutMapping("/students/{id}") public ResponseEntity<ApiResponse> updateStudent(
+            @PathVariable("id") Long id, @RequestBody UserDto studentDto
+                                                                                  ) {
+        try {
+            UserDto updatedStudent = adminService.updateStudent(id, studentDto);
+
+            if (updatedStudent == null) {
+                return new ResponseEntity<>(
+                        new ApiResponse(null, "1", "Unable to update student"), HttpStatus.BAD_REQUEST);
+            }
+
+            HashMap<String, Object> responseData = new HashMap<>();
+            responseData.put("student", updatedStudent);
+
+            return new ResponseEntity<>(
+                    new ApiResponse(responseData, "0", "Student updated successfully"), HttpStatus.OK);
         }
         catch (Exception ex) {
             return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
