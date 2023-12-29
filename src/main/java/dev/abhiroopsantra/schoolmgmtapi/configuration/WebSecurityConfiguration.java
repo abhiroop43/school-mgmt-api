@@ -15,10 +15,7 @@ import dev.abhiroopsantra.schoolmgmtapi.filters.JwtRequestFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
-@Configuration
-@EnableMethodSecurity
-@EnableWebSecurity
-public class WebSecurityConfiguration {
+@Configuration @EnableMethodSecurity @EnableWebSecurity public class WebSecurityConfiguration {
 
     private final JwtRequestFilter jwtRequestFilter;
 
@@ -26,27 +23,19 @@ public class WebSecurityConfiguration {
         this.jwtRequestFilter = jwtRequestFilter;
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity.csrf().disable().authorizeHttpRequests().requestMatchers("/login").permitAll()
-                .and()
-                .authorizeHttpRequests().requestMatchers("*").authenticated()
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+    @Bean public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        return httpSecurity.csrf().disable().authorizeHttpRequests().requestMatchers("/login").permitAll().and()
+                           .authorizeHttpRequests().requestMatchers("/api/**").authenticated().and().sessionManagement()
+                           .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                           .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class).build();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
+    @Bean public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public AuthenticationManager
-    authenticationManager(AuthenticationConfiguration configuration)
-            throws Exception {
+    @Bean public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+    throws Exception {
         return configuration.getAuthenticationManager();
     }
 }

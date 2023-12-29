@@ -1,8 +1,8 @@
 package dev.abhiroopsantra.schoolmgmtapi.controllers;
 
-import dev.abhiroopsantra.schoolmgmtapi.dto.Auth.UserDto;
-import dev.abhiroopsantra.schoolmgmtapi.dto.AuthenticationRequest;
-import dev.abhiroopsantra.schoolmgmtapi.dto.AuthenticationResponse;
+import dev.abhiroopsantra.schoolmgmtapi.dto.UserDto;
+import dev.abhiroopsantra.schoolmgmtapi.dto.Auth.AuthenticationRequest;
+import dev.abhiroopsantra.schoolmgmtapi.dto.ApiResponse;
 import dev.abhiroopsantra.schoolmgmtapi.entities.User;
 import dev.abhiroopsantra.schoolmgmtapi.repositories.UserRepository;
 import dev.abhiroopsantra.schoolmgmtapi.utils.JwtUtil;
@@ -21,8 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Optional;
 
-@RestController
-public class AuthenticationController {
+@RestController public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
 
@@ -34,31 +33,28 @@ public class AuthenticationController {
 
     private final ModelMapper modelMapper;
 
-    public AuthenticationController(AuthenticationManager authenticationManager,
-                                    UserDetailsService userDetailsService,
-                                    JwtUtil jwtUtil,
-                                    UserRepository userRepository,
-                                    ModelMapper modelMapper) {
+    public AuthenticationController(
+            AuthenticationManager authenticationManager, UserDetailsService userDetailsService, JwtUtil jwtUtil,
+            UserRepository userRepository, ModelMapper modelMapper
+                                   ) {
         this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
-        this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
-        this.modelMapper = modelMapper;
+        this.userDetailsService    = userDetailsService;
+        this.jwtUtil               = jwtUtil;
+        this.userRepository        = userRepository;
+        this.modelMapper           = modelMapper;
     }
 
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> createAuthenticationToken(
-            @RequestBody AuthenticationRequest authenticationRequest) {
+    @PostMapping("/login") public ResponseEntity<ApiResponse> createAuthenticationToken(
+            @RequestBody AuthenticationRequest authenticationRequest
+                                                                                       ) {
         try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            authenticationRequest.getEmail(),
-                            authenticationRequest.getPassword()
-                    ));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(),
+                                                                                       authenticationRequest.getPassword()
+            ));
 
             final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getEmail());
-            Optional<User> user = userRepository.findFirstByEmail(authenticationRequest.getEmail());
+            Optional<User>    user        = userRepository.findFirstByEmail(authenticationRequest.getEmail());
 
             final String jwt = jwtUtil.generateToken(userDetails.getUsername());
 
@@ -70,29 +66,17 @@ public class AuthenticationController {
                 responseData.put("user", null);
             }
 
-            return new ResponseEntity<>(
-                    new AuthenticationResponse(
-                            responseData,
-                            "0",
-                            "Success"),
-                    HttpStatus.OK
-            );
+            return new ResponseEntity<>(new ApiResponse(responseData, "0", "Success"), HttpStatus.OK);
 
-        } catch (BadCredentialsException ex) {
-            return new ResponseEntity<>(
-                    new AuthenticationResponse(
-                            null,
-                            "1",
-                            "Incorrect username or password"),
-                    HttpStatus.BAD_REQUEST
+        }
+        catch (BadCredentialsException ex) {
+            return new ResponseEntity<>(new ApiResponse(null, "1", "Incorrect username or password"),
+                                        HttpStatus.BAD_REQUEST
             );
-        } catch (Exception ex) {
-            return new ResponseEntity<>(
-                    new AuthenticationResponse(
-                            null,
-                            "2",
-                            "An error occurred while authenticating"),
-                    HttpStatus.INTERNAL_SERVER_ERROR
+        }
+        catch (Exception ex) {
+            return new ResponseEntity<>(new ApiResponse(null, "2", "An error occurred while authenticating"),
+                                        HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
 
