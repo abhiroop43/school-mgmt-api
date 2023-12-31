@@ -1,6 +1,7 @@
 package dev.abhiroopsantra.schoolmgmtapi.controllers;
 
 import dev.abhiroopsantra.schoolmgmtapi.dto.ApiResponse;
+import dev.abhiroopsantra.schoolmgmtapi.dto.FeeDto;
 import dev.abhiroopsantra.schoolmgmtapi.dto.UserDto;
 import dev.abhiroopsantra.schoolmgmtapi.services.admin.AdminService;
 import org.springframework.data.domain.Page;
@@ -101,5 +102,30 @@ import java.util.HashMap;
         catch (Exception ex) {
             return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+
+    // pay the fees for a student
+    @PostMapping("/fee/{studentId}") public ResponseEntity<ApiResponse> payFee(
+            @PathVariable Long studentId, @RequestBody FeeDto feeDto
+                                                                              ) {
+        try {
+            FeeDto paidFee = adminService.payFee(studentId, feeDto);
+
+            if (paidFee == null) {
+                return new ResponseEntity<>(
+                        new ApiResponse(null, "1", "Unable to pay fee for the student"), HttpStatus.BAD_REQUEST);
+            }
+
+            HashMap<String, Object> responseData = new HashMap<>();
+            responseData.put("fee", paidFee);
+
+            return new ResponseEntity<>(
+                    new ApiResponse(responseData, "0", "Fee paid successfully"), HttpStatus.CREATED);
+        }
+        catch (Exception ex) {
+            return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

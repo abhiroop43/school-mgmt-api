@@ -1,8 +1,11 @@
 package dev.abhiroopsantra.schoolmgmtapi.services.admin;
 
+import dev.abhiroopsantra.schoolmgmtapi.dto.FeeDto;
 import dev.abhiroopsantra.schoolmgmtapi.dto.UserDto;
+import dev.abhiroopsantra.schoolmgmtapi.entities.Fee;
 import dev.abhiroopsantra.schoolmgmtapi.entities.User;
 import dev.abhiroopsantra.schoolmgmtapi.enums.UserRole;
+import dev.abhiroopsantra.schoolmgmtapi.repositories.FeeRepository;
 import dev.abhiroopsantra.schoolmgmtapi.repositories.UserRepository;
 import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
@@ -21,11 +24,15 @@ import java.util.Optional;
     private final Environment    env;
     private final UserRepository userRepository;
     private final ModelMapper    modelMapper;
+    private final FeeRepository  feeRepository;
 
-    public AdminServiceImpl(UserRepository userRepository, Environment env, ModelMapper modelMapper) {
+    public AdminServiceImpl(
+            UserRepository userRepository, Environment env, ModelMapper modelMapper, FeeRepository feeRepository
+                           ) {
         this.userRepository = userRepository;
         this.env            = env;
         this.modelMapper    = modelMapper;
+        this.feeRepository  = feeRepository;
     }
 
     @PostConstruct public void createAdminAccount() {
@@ -115,5 +122,22 @@ import java.util.Optional;
         userRepository.save(student);
 
         return true;
+    }
+
+    @Override public FeeDto payFee(Long studentId, FeeDto feeDto) {
+        Optional<User> user = userRepository.findById(studentId);
+
+        if (user.isEmpty()) {
+            return null;
+        }
+
+        User student = user.get();
+
+        Fee fee = modelMapper.map(feeDto, Fee.class);
+        fee.setStudent(student);
+        fee.setCreatedAt(new Date());
+
+        Fee paidFees = feeRepository.save(fee);
+        return modelMapper.map(paidFees, FeeDto.class);
     }
 }
