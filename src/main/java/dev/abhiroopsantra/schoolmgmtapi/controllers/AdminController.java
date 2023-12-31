@@ -81,4 +81,25 @@ import java.util.HashMap;
             return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // api to delete a student
+    @DeleteMapping("/students/{id}") public ResponseEntity<ApiResponse> deleteStudent(@PathVariable("id") Long id) {
+        try {
+            Boolean isDeleted = adminService.deleteStudent(id);
+
+            if (!isDeleted) {
+                return new ResponseEntity<>(
+                        new ApiResponse(null, "1", "Unable to delete student"), HttpStatus.BAD_REQUEST);
+            }
+
+            HashMap<String, Object> responseData = new HashMap<>();
+            responseData.put("isDeleted", isDeleted);
+
+            return new ResponseEntity<>(
+                    new ApiResponse(responseData, "0", "Student deleted successfully"), HttpStatus.OK);
+        }
+        catch (Exception ex) {
+            return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

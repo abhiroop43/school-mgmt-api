@@ -42,6 +42,9 @@ import java.util.Optional;
         adminAccount.setPassword(new BCryptPasswordEncoder().encode(env.getProperty("admin.password")));
 
         adminAccount.setRole(UserRole.ADMIN);
+        adminAccount.setCreatedAt(new Date());
+        adminAccount.setCreatedBy("System");
+        adminAccount.setIsActive(true);
 
         userRepository.save(adminAccount);
     }
@@ -57,13 +60,17 @@ import java.util.Optional;
         student.setPassword(new BCryptPasswordEncoder().encode(env.getProperty("default.password")));
         student.setRole(UserRole.STUDENT);
         student.setCreatedAt(new Date());
+        student.setCreatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
+        student.setIsActive(true);
 
         User createdUser = userRepository.save(student);
         return modelMapper.map(createdUser, UserDto.class);
     }
 
     @Override public Page<UserDto> getStudents(Pageable pageable) {
-        Page<User> students = userRepository.findAllByRole(UserRole.STUDENT, pageable);
+        // list onlu active students
+        Page<User> students = userRepository.findAllByRoleAndIsActive(UserRole.STUDENT, true, pageable);
+
         return students.map(student -> modelMapper.map(student, UserDto.class));
     }
 
@@ -82,11 +89,31 @@ import java.util.Optional;
         student.setMotherName(studentDto.getMotherName());
         student.setAddress(studentDto.getAddress());
         student.setStudentClass(studentDto.getStudentClass());
+        student.setIsActive(true);
 
         student.setUpdatedAt(new Date());
         student.setUpdatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
 
         User updatedUser = userRepository.save(student);
         return modelMapper.map(updatedUser, UserDto.class);
+    }
+
+    @Override public Boolean deleteStudent(Long id) {
+
+        Optional<User> user = userRepository.findById(id);
+
+        if (user.isEmpty()) {
+            return false;
+        }
+
+        // soft delete the student
+        User student = user.get();
+        student.setIsActive(false);
+        student.setUpdatedAt(new Date());
+        student.setUpdatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        userRepository.save(student);
+
+        return true;
     }
 }

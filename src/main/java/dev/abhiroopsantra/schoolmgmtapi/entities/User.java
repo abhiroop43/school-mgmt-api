@@ -30,4 +30,5 @@ import java.util.Date;
     private String   CreatedBy = "SYSTEM";
     private Date     UpdatedAt;
     private String   UpdatedBy;
+    private Boolean  isActive  = true;
 }

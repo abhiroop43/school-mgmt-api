@@ -14,5 +14,5 @@ import java.util.Optional;
 
     Optional<User> findFirstByEmail(String email);
 
-    Page<User> findAllByRole(UserRole userRole, Pageable pageable);
+    Page<User> findAllByRoleAndIsActive(UserRole userRole, Boolean isActive, Pageable pageable);
 }

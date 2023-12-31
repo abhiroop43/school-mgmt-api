@@ -10,4 +10,6 @@ public interface AdminService {
     Page<UserDto> getStudents(Pageable pageable);
 
     UserDto updateStudent(Long id, UserDto studentDto);
+
+    Boolean deleteStudent(Long id);
 }
