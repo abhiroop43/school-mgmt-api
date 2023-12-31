@@ -69,7 +69,7 @@ import java.util.Optional;
 
     @Override public Page<UserDto> getStudents(Pageable pageable) {
         // list onlu active students
-        Page<User> students = userRepository.findAllByRoleAndIsActive(UserRole.STUDENT, true, pageable);
+        Page<User> students = userRepository.findByRoleAndIsActive(UserRole.STUDENT, true, pageable);
 
         return students.map(student -> modelMapper.map(student, UserDto.class));
     }
