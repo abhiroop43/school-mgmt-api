@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -66,5 +67,31 @@ import java.util.Optional;
         StudentLeave submittedLeave = studentLeaveRepository.save(studentLeave);
 
         return modelMapper.map(submittedLeave, StudentLeaveDto.class);
+    }
+
+    @Override public List<StudentLeaveDto> getAllAppliedLeavesByStudentId(Long id) {
+        // get the student with the id
+        Optional<User> student = userRepository.findById(id);
+
+        // check if the student exists
+        if (student.isEmpty()) {
+            throw new BadRequestException(
+                    "Either the student does not exist of you are not authorized to view this student's details");
+        }
+
+        // get the currently logged in user
+        String currentLoggedInUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // check if the currently logged in user is the same as the student with the id
+        if (!currentLoggedInUserEmail.equals(student.get().getEmail())) {
+            throw new BadRequestException(
+                    "Either the student does not exist of you are not authorized to view this student's details");
+        }
+
+        // get all the leaves applied by the student
+        List<StudentLeave> studentLeaves = studentLeaveRepository.findAllByStudentId(id);
+
+        return studentLeaves.stream().map(studentLeave -> modelMapper.map(studentLeave, StudentLeaveDto.class))
+                            .toList();
     }
 }

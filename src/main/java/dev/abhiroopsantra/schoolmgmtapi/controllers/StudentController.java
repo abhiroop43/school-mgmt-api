@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 @RestController @RequiredArgsConstructor @RequestMapping("/api/student") public class StudentController {
     private final StudentService studentService;
@@ -54,6 +55,36 @@ import java.util.HashMap;
 
             return new ResponseEntity<>(
                     new ApiResponse(responseData, "0", "Leaves applied successfully"), HttpStatus.OK);
+        }
+        catch (UnauthorizedException ex) {
+            return new ResponseEntity<>(new ApiResponse(null, "3", ex.getMessage()), HttpStatus.FORBIDDEN);
+        }
+        catch (NotFoundException ex) {
+            return new ResponseEntity<>(new ApiResponse(null, "1", ex.getMessage()), HttpStatus.NOT_FOUND);
+        }
+        catch (BadRequestException ex) {
+            return new ResponseEntity<>(new ApiResponse(null, "4", ex.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception ex) {
+            return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // api to get all leaves applied by student
+    @GetMapping("/{id}/leaves") public ResponseEntity<ApiResponse> getAllAppliedLeavesByStudentId(
+            @PathVariable("id") Long id
+                                                                                                 ) {
+        try {
+
+            // TODO: Add pagination and filtering
+
+            List<StudentLeaveDto> leaves = studentService.getAllAppliedLeavesByStudentId(id);
+
+            HashMap<String, Object> responseData = new HashMap<>();
+            responseData.put("leaves", leaves);
+
+            return new ResponseEntity<>(
+                    new ApiResponse(responseData, "0", "Student fetched successfully"), HttpStatus.OK);
         }
         catch (UnauthorizedException ex) {
             return new ResponseEntity<>(new ApiResponse(null, "3", ex.getMessage()), HttpStatus.FORBIDDEN);
