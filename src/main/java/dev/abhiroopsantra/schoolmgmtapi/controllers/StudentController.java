@@ -2,6 +2,9 @@ package dev.abhiroopsantra.schoolmgmtapi.controllers;
 
 import dev.abhiroopsantra.schoolmgmtapi.dto.ApiResponse;
 import dev.abhiroopsantra.schoolmgmtapi.dto.UserDto;
+import dev.abhiroopsantra.schoolmgmtapi.exceptions.BadRequestException;
+import dev.abhiroopsantra.schoolmgmtapi.exceptions.NotFoundException;
+import dev.abhiroopsantra.schoolmgmtapi.exceptions.UnauthorizedException;
 import dev.abhiroopsantra.schoolmgmtapi.services.student.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,17 +24,20 @@ import java.util.HashMap;
         try {
             UserDto student = studentService.getStudentById(id);
 
-            if (student == null) {
-                return new ResponseEntity<>(new ApiResponse(null, "1", "Unable to find student with id " + id),
-                                            HttpStatus.NOT_FOUND
-                );
-            }
-
             HashMap<String, Object> responseData = new HashMap<>();
             responseData.put("student", student);
 
             return new ResponseEntity<>(
                     new ApiResponse(responseData, "0", "Student fetched successfully"), HttpStatus.OK);
+        }
+        catch (UnauthorizedException ex) {
+            return new ResponseEntity<>(new ApiResponse(null, "3", ex.getMessage()), HttpStatus.FORBIDDEN);
+        }
+        catch (NotFoundException ex) {
+            return new ResponseEntity<>(new ApiResponse(null, "1", ex.getMessage()), HttpStatus.NOT_FOUND);
+        }
+        catch (BadRequestException ex) {
+            return new ResponseEntity<>(new ApiResponse(null, "4", ex.getMessage()), HttpStatus.BAD_REQUEST);
         }
         catch (Exception ex) {
             return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);

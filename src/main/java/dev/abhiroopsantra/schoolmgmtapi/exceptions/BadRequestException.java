@@ -2,5 +2,5 @@ package dev.abhiroopsantra.schoolmgmtapi.exceptions;
 
 import lombok.experimental.StandardException;
 
-@StandardException public class BadRequestException extends Throwable {
+@StandardException public class BadRequestException extends RuntimeException {
 }
