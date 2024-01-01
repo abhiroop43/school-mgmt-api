@@ -1,10 +1,12 @@
 package dev.abhiroopsantra.schoolmgmtapi.services.student;
 
+import dev.abhiroopsantra.schoolmgmtapi.dto.StudentLeaveDto;
 import dev.abhiroopsantra.schoolmgmtapi.dto.UserDto;
+import dev.abhiroopsantra.schoolmgmtapi.entities.StudentLeave;
 import dev.abhiroopsantra.schoolmgmtapi.entities.User;
+import dev.abhiroopsantra.schoolmgmtapi.enums.StudentLeaveStatus;
 import dev.abhiroopsantra.schoolmgmtapi.exceptions.BadRequestException;
-import dev.abhiroopsantra.schoolmgmtapi.exceptions.NotFoundException;
-import dev.abhiroopsantra.schoolmgmtapi.exceptions.UnauthorizedException;
+import dev.abhiroopsantra.schoolmgmtapi.repositories.StudentLeaveRepository;
 import dev.abhiroopsantra.schoolmgmtapi.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -15,8 +17,9 @@ import java.util.Optional;
 
 
 @Service @RequiredArgsConstructor public class StudentServiceImpl implements StudentService {
-    private final UserRepository userRepository;
-    private final ModelMapper    modelMapper;
+    private final UserRepository         userRepository;
+    private final ModelMapper            modelMapper;
+    private final StudentLeaveRepository studentLeaveRepository;
 
     @Override public UserDto getStudentById(Long id) {
         // get the student with the id
@@ -38,5 +41,30 @@ import java.util.Optional;
         }
 
         return modelMapper.map(student.get(), UserDto.class);
+    }
+
+    @Override public StudentLeaveDto applyForLeave(StudentLeaveDto studentLeaveDto) {
+        // get the currently logged in user
+        String currentLoggedInUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // get the student with the email
+        Optional<User> student = userRepository.findFirstByEmail(currentLoggedInUserEmail);
+
+        // check if the student exists
+        if (student.isEmpty()) {
+            throw new BadRequestException(
+                    "Either the student does not exist of you are not authorized to apply for leave");
+        }
+
+        // TODO: Validate the leave dates
+
+        // add new leave to the student
+        StudentLeave studentLeave = modelMapper.map(studentLeaveDto, StudentLeave.class);
+        studentLeave.setStudentLeaveStatus(StudentLeaveStatus.PENDING);
+        studentLeave.setStudent(student.get());
+
+        StudentLeave submittedLeave = studentLeaveRepository.save(studentLeave);
+
+        return modelMapper.map(submittedLeave, StudentLeaveDto.class);
     }
 }
