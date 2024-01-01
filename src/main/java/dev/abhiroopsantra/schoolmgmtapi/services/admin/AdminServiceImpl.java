@@ -140,4 +140,9 @@ import java.util.Optional;
         Fee paidFees = feeRepository.save(fee);
         return modelMapper.map(paidFees, FeeDto.class);
     }
+
+    @Override public UserDto getStudentById(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        return user.map(value -> modelMapper.map(value, UserDto.class)).orElse(null);
+    }
 }

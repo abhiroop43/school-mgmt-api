@@ -15,4 +15,6 @@ public interface AdminService {
     Boolean deleteStudent(Long id);
 
     FeeDto payFee(Long studentId, FeeDto feeDto);
+
+    UserDto getStudentById(Long id);
 }

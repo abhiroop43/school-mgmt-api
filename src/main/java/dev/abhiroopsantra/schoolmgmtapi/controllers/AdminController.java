@@ -60,6 +60,28 @@ import java.util.HashMap;
         }
     }
 
+    // api method to get a specific student by id
+    @GetMapping("/students/{id}") public ResponseEntity<ApiResponse> getStudentById(@PathVariable("id") Long id) {
+        try {
+            UserDto student = adminService.getStudentById(id);
+
+            if (student == null) {
+                return new ResponseEntity<>(new ApiResponse(null, "1", "Unable to find student with id " + id),
+                                            HttpStatus.NOT_FOUND
+                );
+            }
+
+            HashMap<String, Object> responseData = new HashMap<>();
+            responseData.put("student", student);
+
+            return new ResponseEntity<>(
+                    new ApiResponse(responseData, "0", "Student fetched successfully"), HttpStatus.OK);
+        }
+        catch (Exception ex) {
+            return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // api method to update a student
     @PutMapping("/students/{id}") public ResponseEntity<ApiResponse> updateStudent(
             @PathVariable("id") Long id, @RequestBody UserDto studentDto
