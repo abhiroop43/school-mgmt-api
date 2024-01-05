@@ -7,13 +7,393 @@
 	},
 	"item": [
 		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Create New Student",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsImlhdCI6MTcwNDEzNjcyMywiZXhwIjoxNzA0MTQwMzIzfQ.WAS1xWqXA_Y95lm8fT_5gOdH735qpUne3NGISPrggSs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Amit Patel\",\n    \"email\": \"amit.patel@example.com\",\n    \"fatherName\": \"Sanjay Patel\",\n    \"motherName\": \"Meera Patel\",\n    \"dateOfBirth\": \"1992-03-25\",\n    \"address\": \"Ahmedabad, India\",\n    \"gender\": \"MALE\",\n    \"studentClass\": \"Graduate\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/admin/students",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"admin",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List All Students",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsImlhdCI6MTcwNDA4MzYyNSwiZXhwIjoxNzA0MDg3MjI1fQ.aMRBv2ie_9QdBZCgQlcWKOMo20VwNzYPYh3Ha6coCmY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/admin/students?page=0&sort=name,asc&size=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"admin",
+								"students"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "sort",
+									"value": "name,asc"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a Student",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsImlhdCI6MTcwMzg3NzczNiwiZXhwIjoxNzAzODgxMzM2fQ.JORJBhpF0igltxZVkvtfZmhzAN0sXjoBRSDC5QiOx0M",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Amitabh Patel\",\n    \"fatherName\": \"Sanju Patel\",\n    \"motherName\": \"Mina Patel\",\n    \"address\": \"Ahmedabad, Gujrat, India\",\n    \"studentClass\": \"10th\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/admin/students/6",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"admin",
+								"students",
+								"6"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a Student",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsImlhdCI6MTcwMzk5OTYwMiwiZXhwIjoxNzA0MDAzMjAyfQ.PepJFP3kWs1ZItVwb6yJUt_oPd8EVJsVxVTcDRSLCp8",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/admin/students/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"admin",
+								"students",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pay Student Fees",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsImlhdCI6MTcwNDAwMjU4MiwiZXhwIjoxNzA0MDA2MTgyfQ._N0w_o-VDauVDJHqNiwrhGZQy9TsLoDrewpjTk9ZQbM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"month\": \"October\",\n    \"givenBy\": \"Priya Sharma\",\n    \"amount\": 5000,\n    \"description\": \"Semester Fees\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/admin/fee/3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"admin",
+								"fee",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get A Student Details By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsImlhdCI6MTcwNDA4MzYyNSwiZXhwIjoxNzA0MDg3MjI1fQ.aMRBv2ie_9QdBZCgQlcWKOMo20VwNzYPYh3Ha6coCmY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/admin/students/5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"admin",
+								"students",
+								"5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Student",
+			"item": [
+				{
+					"name": "Get Student Details",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbWl0LnBhdGVsQGV4YW1wbGUuY29tIiwiaWF0IjoxNzA0MDgzNzE0LCJleHAiOjE3MDQwODczMTR9.4j-KPyPXdZ9dzr_i2HXeNwilGgz-hUD-cp7PfMpofss",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/student/10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"student",
+								"10"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Apply For Leave",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbWl0LnBhdGVsQGV4YW1wbGUuY29tIiwiaWF0IjoxNzA0MTM2ODM5LCJleHAiOjE3MDQxNDA0Mzl9.QZGbGLlXTBMO8sK_o5eBGibopPini05dqjmRJDWdWNo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"subject\": \"Hangover Leave\",\n    \"body\": \"I got a huge hangover due to too much drinking in NYE party, so need few days off to recover\",\n    \"leaveStartDate\": \"2024-01-01\",\n    \"leaveEndDate\": \"2024-01-02\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/student/leave",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"student",
+								"leave"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Applied Leaves for Student",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbWl0LnBhdGVsQGV4YW1wbGUuY29tIiwiaWF0IjoxNzA0MTM2ODM5LCJleHAiOjE3MDQxNDA0Mzl9.QZGbGLlXTBMO8sK_o5eBGibopPini05dqjmRJDWdWNo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/student/5/leaves",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"student",
+								"5",
+								"leaves"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Login",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"admin@test.com\",\n    \"password\": \"admin\"\n\n    // \"email\": \"amit.patel@example.com\",\n    // \"password\": \"Welcome2Sch00l\"\n}",
+					"raw": "{\n    // \"email\": \"admin@test.com\",\n    // \"password\": \"admin\"\n\n    \"email\": \"amit.patel@example.com\",\n    \"password\": \"Abcd@12345\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -29,103 +409,6 @@
 					"port": "8080",
 					"path": [
 						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create New Student",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsImlhdCI6MTcwMzg0MTQzOCwiZXhwIjoxNzAzODQ1MDM4fQ.-vIkRQC35lknr1pt6JJO3ohqvur_QPF5a5paM_UQ7RU",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"name\": \"Amit Patel\",\n    \"email\": \"amit.patel@example.com\",\n    \"fatherName\": \"Sanjay Patel\",\n    \"motherName\": \"Meera Patel\",\n    \"dateOfBirth\": \"1992-03-25\",\n    \"address\": \"Ahmedabad, India\",\n    \"gender\": \"MALE\",\n    \"studentClass\": \"Graduate\",\n    \"createdBy\": \"Admin\"\n}\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/api/admin/students",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"admin",
-						"students"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "List All Students",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwic3ViIjoiYWRtaW5AdGVzdC5jb20iLCJpYXQiOjE3MDM4NjAxNjUsImV4cCI6MTcwMzg2Mzc2NX0.kz45HmStEagdCAXtS_sV9pKdablPOeKxY60kzl5WnEI",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/api/admin/students?page=0&sort=name,asc&size=1",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"admin",
-						"students"
-					],
-					"query": [
-						{
-							"key": "page",
-							"value": "0"
-						},
-						{
-							"key": "sort",
-							"value": "name,asc"
-						},
-						{
-							"key": "size",
-							"value": "1"
-						}
 					]
 				}
 			},

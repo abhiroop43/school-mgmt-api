@@ -49,4 +49,8 @@ import java.util.List;
         return new ResponseEntity<>(new ApiResponse(responseData, "0", "Student fetched successfully"), HttpStatus.OK);
     }
 
+    // TODO: Register new student with Admin approval
+
+    // TODO: Update student details with Admin approval
+
 }
