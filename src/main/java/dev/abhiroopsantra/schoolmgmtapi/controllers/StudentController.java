@@ -99,4 +99,5 @@ import java.util.List;
             return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }

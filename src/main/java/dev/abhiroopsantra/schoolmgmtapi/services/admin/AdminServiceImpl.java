@@ -3,9 +3,12 @@ package dev.abhiroopsantra.schoolmgmtapi.services.admin;
 import dev.abhiroopsantra.schoolmgmtapi.dto.FeeDto;
 import dev.abhiroopsantra.schoolmgmtapi.dto.UserDto;
 import dev.abhiroopsantra.schoolmgmtapi.entities.Fee;
+import dev.abhiroopsantra.schoolmgmtapi.entities.StudentLeave;
 import dev.abhiroopsantra.schoolmgmtapi.entities.User;
+import dev.abhiroopsantra.schoolmgmtapi.enums.StudentLeaveStatus;
 import dev.abhiroopsantra.schoolmgmtapi.enums.UserRole;
 import dev.abhiroopsantra.schoolmgmtapi.repositories.FeeRepository;
+import dev.abhiroopsantra.schoolmgmtapi.repositories.StudentLeaveRepository;
 import dev.abhiroopsantra.schoolmgmtapi.repositories.UserRepository;
 import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
@@ -21,18 +24,21 @@ import java.util.Optional;
 
 @Service public class AdminServiceImpl implements AdminService {
 
-    private final Environment    env;
-    private final UserRepository userRepository;
-    private final ModelMapper    modelMapper;
-    private final FeeRepository  feeRepository;
+    private final Environment            env;
+    private final UserRepository         userRepository;
+    private final ModelMapper            modelMapper;
+    private final FeeRepository          feeRepository;
+    private final StudentLeaveRepository studentLeaveRepository;
 
     public AdminServiceImpl(
-            UserRepository userRepository, Environment env, ModelMapper modelMapper, FeeRepository feeRepository
+            UserRepository userRepository, Environment env, ModelMapper modelMapper, FeeRepository feeRepository,
+            StudentLeaveRepository studentLeaveRepository
                            ) {
-        this.userRepository = userRepository;
-        this.env            = env;
-        this.modelMapper    = modelMapper;
-        this.feeRepository  = feeRepository;
+        this.userRepository         = userRepository;
+        this.env                    = env;
+        this.modelMapper            = modelMapper;
+        this.feeRepository          = feeRepository;
+        this.studentLeaveRepository = studentLeaveRepository;
     }
 
     @PostConstruct public void createAdminAccount() {
@@ -144,5 +150,25 @@ import java.util.Optional;
     @Override public UserDto getStudentById(Long id) {
         Optional<User> user = userRepository.findById(id);
         return user.map(value -> modelMapper.map(value, UserDto.class)).orElse(null);
+    }
+
+    @Override public boolean updateStudentLeaveStatus(Long leaveId, StudentLeaveStatus leaveStatus) {
+        // get the leave
+        Optional<StudentLeave> studentLeave = studentLeaveRepository.findById(leaveId);
+
+        // check if the leave exists
+        if (studentLeave.isEmpty()) {
+            return false;
+        }
+
+        // update the leave status
+        StudentLeave leave = studentLeave.get();
+        leave.setStudentLeaveStatus(leaveStatus);
+        leave.setUpdatedAt(new Date());
+        leave.setUpdatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        studentLeaveRepository.save(leave);
+
+        return true;
     }
 }

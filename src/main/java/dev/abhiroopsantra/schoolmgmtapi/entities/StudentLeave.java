@@ -21,6 +21,11 @@ import java.util.Date;
     private Date               leaveEndDate;
     private StudentLeaveStatus studentLeaveStatus;
 
+    private Date   createdAt;
+    private String createdBy;
+    private Date   updatedAt;
+    private String updatedBy;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "student_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)

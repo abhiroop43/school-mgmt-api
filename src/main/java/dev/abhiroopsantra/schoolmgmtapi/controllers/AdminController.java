@@ -3,6 +3,7 @@ package dev.abhiroopsantra.schoolmgmtapi.controllers;
 import dev.abhiroopsantra.schoolmgmtapi.dto.ApiResponse;
 import dev.abhiroopsantra.schoolmgmtapi.dto.FeeDto;
 import dev.abhiroopsantra.schoolmgmtapi.dto.UserDto;
+import dev.abhiroopsantra.schoolmgmtapi.enums.StudentLeaveStatus;
 import dev.abhiroopsantra.schoolmgmtapi.services.admin.AdminService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -146,6 +147,29 @@ import java.util.HashMap;
 
             return new ResponseEntity<>(
                     new ApiResponse(responseData, "0", "Fee paid successfully"), HttpStatus.CREATED);
+        }
+        catch (Exception ex) {
+            return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    // list student leaves
+
+    // update student leave status
+    @PutMapping("/leave/{leaveId}") public ResponseEntity<ApiResponse> updateStudentLeaveStatus(
+            @PathVariable Long leaveId, @RequestBody StudentLeaveStatus leaveStatus
+                                                                                               ) {
+        try {
+            boolean isUpdateSuccessful = adminService.updateStudentLeaveStatus(leaveId, leaveStatus);
+
+            if (!isUpdateSuccessful) {
+                return new ResponseEntity<>(new ApiResponse(null, "1", "Unable to update leave status for the student"),
+                                            HttpStatus.BAD_REQUEST
+                );
+            }
+
+            return new ResponseEntity<>(new ApiResponse(null, "0", "Leave status updated successfully"), HttpStatus.OK);
         }
         catch (Exception ex) {
             return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);

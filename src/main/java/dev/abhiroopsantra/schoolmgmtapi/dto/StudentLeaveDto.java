@@ -13,5 +13,9 @@ import java.util.Date;
     private Date               leaveStartDate;
     private Date               leaveEndDate;
     private StudentLeaveStatus studentLeaveStatus;
+    private Date               createdAt;
+    private String             createdBy;
+    private Date               updatedAt;
+    private String             updatedBy;
     private Long               studentId;
 }

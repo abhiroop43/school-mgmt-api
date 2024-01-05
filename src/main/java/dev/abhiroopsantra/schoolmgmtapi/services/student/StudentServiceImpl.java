@@ -63,6 +63,8 @@ import java.util.Optional;
         StudentLeave studentLeave = modelMapper.map(studentLeaveDto, StudentLeave.class);
         studentLeave.setStudentLeaveStatus(StudentLeaveStatus.PENDING);
         studentLeave.setStudent(student.get());
+        studentLeave.setCreatedAt(new java.util.Date());
+        studentLeave.setCreatedBy(currentLoggedInUserEmail);
 
         StudentLeave submittedLeave = studentLeaveRepository.save(studentLeave);
 
