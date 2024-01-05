@@ -71,12 +71,5 @@ import java.util.Optional;
                                         HttpStatus.BAD_REQUEST
             );
         }
-        catch (Exception ex) {
-            return new ResponseEntity<>(new ApiResponse(null, "2", "An error occurred while authenticating"),
-                                        HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
-
-
     }
 }

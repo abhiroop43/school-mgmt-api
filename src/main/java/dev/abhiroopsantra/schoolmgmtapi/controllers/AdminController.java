@@ -2,8 +2,11 @@ package dev.abhiroopsantra.schoolmgmtapi.controllers;
 
 import dev.abhiroopsantra.schoolmgmtapi.dto.ApiResponse;
 import dev.abhiroopsantra.schoolmgmtapi.dto.FeeDto;
+import dev.abhiroopsantra.schoolmgmtapi.dto.StudentLeaveDto;
 import dev.abhiroopsantra.schoolmgmtapi.dto.UserDto;
 import dev.abhiroopsantra.schoolmgmtapi.enums.StudentLeaveStatus;
+import dev.abhiroopsantra.schoolmgmtapi.exceptions.BadRequestException;
+import dev.abhiroopsantra.schoolmgmtapi.exceptions.NotFoundException;
 import dev.abhiroopsantra.schoolmgmtapi.services.admin.AdminService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,110 +26,76 @@ import java.util.HashMap;
 
     // api method to create a new student
     @PostMapping("/students") public ResponseEntity<ApiResponse> addStudent(@RequestBody UserDto studentDto) {
-        try {
-            UserDto createdStudent = adminService.postStudent(studentDto);
-
-            if (createdStudent == null) {
-                return new ResponseEntity<>(
-                        new ApiResponse(null, "1", "Unable to create new student"), HttpStatus.BAD_REQUEST);
-            }
-
-            HashMap<String, Object> responseData = new HashMap<>();
-            responseData.put("student", createdStudent);
-
-            return new ResponseEntity<>(
-                    new ApiResponse(responseData, "0", "Student created successfully"), HttpStatus.CREATED);
+        UserDto createdStudent = adminService.postStudent(studentDto);
+        if (createdStudent == null) {
+            throw new BadRequestException("Unable to create student");
         }
-        catch (Exception ex) {
-            return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        HashMap<String, Object> responseData = new HashMap<>();
+        responseData.put("student", createdStudent);
+        return new ResponseEntity<>(
+                new ApiResponse(responseData, "0", "Student created successfully"), HttpStatus.CREATED);
 
     }
 
     // api method to list all students
     @GetMapping("/students") public ResponseEntity<ApiResponse> getStudentsList(Pageable pageable) {
-        try {
-            // TODO: Add filtering
 
-            Page<UserDto>           students     = adminService.getStudents(pageable);
-            HashMap<String, Object> responseData = new HashMap<>();
-            responseData.put("students", students.getContent());
-            responseData.put("currentPage", students.getNumber());
-            responseData.put("totalItems", students.getTotalElements());
-            responseData.put("totalPages", students.getTotalPages());
+        // TODO: Add filtering
 
-            return new ResponseEntity<>(
-                    new ApiResponse(responseData, "0", "Students fetched successfully"), HttpStatus.OK);
-        }
-        catch (Exception ex) {
-            return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        Page<UserDto>           students     = adminService.getStudents(pageable);
+        HashMap<String, Object> responseData = new HashMap<>();
+        responseData.put("students", students.getContent());
+        responseData.put("currentPage", students.getNumber());
+        responseData.put("totalItems", students.getTotalElements());
+        responseData.put("totalPages", students.getTotalPages());
+
+        return new ResponseEntity<>(new ApiResponse(responseData, "0", "Students fetched successfully"), HttpStatus.OK);
     }
 
     // api method to get a specific student by id
     @GetMapping("/students/{id}") public ResponseEntity<ApiResponse> getStudentById(@PathVariable("id") Long id) {
-        try {
-            UserDto student = adminService.getStudentById(id);
 
-            if (student == null) {
-                return new ResponseEntity<>(new ApiResponse(null, "1", "Unable to find student with id " + id),
-                                            HttpStatus.NOT_FOUND
-                );
-            }
+        UserDto student = adminService.getStudentById(id);
 
-            HashMap<String, Object> responseData = new HashMap<>();
-            responseData.put("student", student);
-
-            return new ResponseEntity<>(
-                    new ApiResponse(responseData, "0", "Student fetched successfully"), HttpStatus.OK);
+        if (student == null) {
+            throw new NotFoundException("Unable to find student with id " + id);
         }
-        catch (Exception ex) {
-            return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        HashMap<String, Object> responseData = new HashMap<>();
+        responseData.put("student", student);
+
+        return new ResponseEntity<>(new ApiResponse(responseData, "0", "Student fetched successfully"), HttpStatus.OK);
     }
 
     // api method to update a student
     @PutMapping("/students/{id}") public ResponseEntity<ApiResponse> updateStudent(
             @PathVariable("id") Long id, @RequestBody UserDto studentDto
                                                                                   ) {
-        try {
-            UserDto updatedStudent = adminService.updateStudent(id, studentDto);
+        UserDto updatedStudent = adminService.updateStudent(id, studentDto);
 
-            if (updatedStudent == null) {
-                return new ResponseEntity<>(
-                        new ApiResponse(null, "1", "Unable to update student"), HttpStatus.BAD_REQUEST);
-            }
-
-            HashMap<String, Object> responseData = new HashMap<>();
-            responseData.put("student", updatedStudent);
-
-            return new ResponseEntity<>(
-                    new ApiResponse(responseData, "0", "Student updated successfully"), HttpStatus.OK);
+        if (updatedStudent == null) {
+            throw new BadRequestException("Unable to update student");
         }
-        catch (Exception ex) {
-            return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        HashMap<String, Object> responseData = new HashMap<>();
+        responseData.put("student", updatedStudent);
+
+        return new ResponseEntity<>(new ApiResponse(responseData, "0", "Student updated successfully"), HttpStatus.OK);
     }
 
     // api to delete a student
     @DeleteMapping("/students/{id}") public ResponseEntity<ApiResponse> deleteStudent(@PathVariable("id") Long id) {
-        try {
-            Boolean isDeleted = adminService.deleteStudent(id);
+        Boolean isDeleted = adminService.deleteStudent(id);
 
-            if (!isDeleted) {
-                return new ResponseEntity<>(
-                        new ApiResponse(null, "1", "Unable to delete student"), HttpStatus.BAD_REQUEST);
-            }
-
-            HashMap<String, Object> responseData = new HashMap<>();
-            responseData.put("isDeleted", isDeleted);
-
-            return new ResponseEntity<>(
-                    new ApiResponse(responseData, "0", "Student deleted successfully"), HttpStatus.OK);
+        if (!isDeleted) {
+            throw new BadRequestException("Unable to delete student");
         }
-        catch (Exception ex) {
-            return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        HashMap<String, Object> responseData = new HashMap<>();
+        responseData.put("isDeleted", isDeleted);
+
+        return new ResponseEntity<>(new ApiResponse(responseData, "0", "Student deleted successfully"), HttpStatus.OK);
     }
 
 
@@ -134,46 +103,44 @@ import java.util.HashMap;
     @PostMapping("/fee/{studentId}") public ResponseEntity<ApiResponse> payFee(
             @PathVariable Long studentId, @RequestBody FeeDto feeDto
                                                                               ) {
-        try {
-            FeeDto paidFee = adminService.payFee(studentId, feeDto);
+        FeeDto paidFee = adminService.payFee(studentId, feeDto);
 
-            if (paidFee == null) {
-                return new ResponseEntity<>(
-                        new ApiResponse(null, "1", "Unable to pay fee for the student"), HttpStatus.BAD_REQUEST);
-            }
-
-            HashMap<String, Object> responseData = new HashMap<>();
-            responseData.put("fee", paidFee);
-
-            return new ResponseEntity<>(
-                    new ApiResponse(responseData, "0", "Fee paid successfully"), HttpStatus.CREATED);
+        if (paidFee == null) {
+            throw new BadRequestException("Unable to pay fee for the student");
         }
-        catch (Exception ex) {
-            return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        HashMap<String, Object> responseData = new HashMap<>();
+        responseData.put("fee", paidFee);
+
+        return new ResponseEntity<>(new ApiResponse(responseData, "0", "Fee paid successfully"), HttpStatus.CREATED);
 
     }
 
-    // list student leaves
+    // list all students leaves
+    @GetMapping("/students/leaves") public ResponseEntity<ApiResponse> getAllAppliedLeavesByStudentId(
+            Pageable pageable
+                                                                                                     ) {
+        // TODO: Add pagination and filtering
+
+        Page<StudentLeaveDto> leaves = adminService.getAllAppliedLeaves(pageable);
+
+        HashMap<String, Object> responseData = new HashMap<>();
+        responseData.put("students", leaves.getContent());
+        responseData.put("currentPage", leaves.getNumber());
+        responseData.put("totalItems", leaves.getTotalElements());
+        responseData.put("totalPages", leaves.getTotalPages());
+
+        return new ResponseEntity<>(new ApiResponse(responseData, "0", "Student fetched successfully"), HttpStatus.OK);
+    }
 
     // update student leave status
-    @PutMapping("/leave/{leaveId}") public ResponseEntity<ApiResponse> updateStudentLeaveStatus(
+    @PutMapping("/students/leaves/{leaveId}") public ResponseEntity<ApiResponse> updateStudentLeaveStatus(
             @PathVariable Long leaveId, @RequestBody StudentLeaveStatus leaveStatus
-                                                                                               ) {
-        try {
-            boolean isUpdateSuccessful = adminService.updateStudentLeaveStatus(leaveId, leaveStatus);
-
-            if (!isUpdateSuccessful) {
-                return new ResponseEntity<>(new ApiResponse(null, "1", "Unable to update leave status for the student"),
-                                            HttpStatus.BAD_REQUEST
-                );
-            }
-
-            return new ResponseEntity<>(new ApiResponse(null, "0", "Leave status updated successfully"), HttpStatus.OK);
+                                                                                                         ) {
+        boolean isUpdateSuccessful = adminService.updateStudentLeaveStatus(leaveId, leaveStatus);
+        if (!isUpdateSuccessful) {
+            throw new BadRequestException("Unable to update leave status");
         }
-        catch (Exception ex) {
-            return new ResponseEntity<>(new ApiResponse(null, "2", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
+        return new ResponseEntity<>(new ApiResponse(null, "0", "Leave status updated successfully"), HttpStatus.OK);
     }
 }

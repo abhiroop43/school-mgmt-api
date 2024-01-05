@@ -1,6 +1,7 @@
 package dev.abhiroopsantra.schoolmgmtapi.services.admin;
 
 import dev.abhiroopsantra.schoolmgmtapi.dto.FeeDto;
+import dev.abhiroopsantra.schoolmgmtapi.dto.StudentLeaveDto;
 import dev.abhiroopsantra.schoolmgmtapi.dto.UserDto;
 import dev.abhiroopsantra.schoolmgmtapi.entities.Fee;
 import dev.abhiroopsantra.schoolmgmtapi.entities.StudentLeave;
@@ -170,5 +171,12 @@ import java.util.Optional;
         studentLeaveRepository.save(leave);
 
         return true;
+    }
+
+    @Override public Page<StudentLeaveDto> getAllAppliedLeaves(Pageable pageable) {
+        // list all leaves
+        Page<StudentLeave> leaves = studentLeaveRepository.findAll(pageable);
+
+        return leaves.map(leave -> modelMapper.map(leave, StudentLeaveDto.class));
     }
 }
