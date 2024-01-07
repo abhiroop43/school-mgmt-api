@@ -34,12 +34,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/admin/students",
-							"protocol": "http",
+							"raw": "{{baseUrl}}/api/admin/students",
 							"host": [
-								"localhost"
+								"{{baseUrl}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"admin",
@@ -263,6 +261,73 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "List All Teachers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsImlhdCI6MTcwNDY1MzQzNywiZXhwIjoxNzA0NjU3MDM3fQ.mTci7U8eFWj6f2rVcxqZlx6XAXQPAE2wwYerjsgok8o",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/teachers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"teachers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Teacher",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsImlhdCI6MTcwNDY1MzQzNywiZXhwIjoxNzA0NjU3MDM3fQ.mTci7U8eFWj6f2rVcxqZlx6XAXQPAE2wwYerjsgok8o",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe\",\n    \"gender\": \"MALE\",\n    \"department\": \"Computer Science\",\n    \"qualification\": \"PhD\",\n    \"dateOfBirth\": \"1980-01-01\",\n    \"address\": \"123 Main St, Anytown, USA\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/teachers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"teachers"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -280,7 +345,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbWl0LnBhdGVsQGV4YW1wbGUuY29tIiwiaWF0IjoxNzA0MDgzNzE0LCJleHAiOjE3MDQwODczMTR9.4j-KPyPXdZ9dzr_i2HXeNwilGgz-hUD-cp7PfMpofss",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbWl0LnBhdGVsQGV4YW1wbGUuY29tIiwiaWF0IjoxNzA0NTMxMzY4LCJleHAiOjE3MDQ1MzQ5Njh9.sJvW3BXOtuig9SUgWeoRfW5DF7y3GnOp2zCiRdTBg1g",
 									"type": "string"
 								}
 							]
@@ -297,12 +362,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/api/student/10",
-							"protocol": "http",
+							"raw": "{{baseUrl}}/api/student/10",
 							"host": [
-								"localhost"
+								"{{baseUrl}}"
 							],
-							"port": "8080",
 							"path": [
 								"api",
 								"student",
@@ -393,7 +456,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    // \"email\": \"admin@test.com\",\n    // \"password\": \"admin\"\n\n    \"email\": \"amit.patel@example.com\",\n    \"password\": \"Abcd@12345\"\n}",
+					"raw": "{\n    \"email\": \"admin@test.com\",\n    \"password\": \"admin\"\n\n    // \"email\": \"amit.patel@example.com\",\n    // \"password\": \"Abcd@12345\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -401,18 +464,43 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/login",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/login",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8080",
 					"path": [
 						"login"
 					]
 				}
 			},
 			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8919",
+			"type": "string"
 		}
 	]
 }
