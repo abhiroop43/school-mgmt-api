@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ApiResponse> handleNotFoundException(NotFoundException ex) {
-        logger.log(Level.WARNING, "No Data Found", ex);
+        logger.log(Level.WARNING, ex.getMessage());
         return new ResponseEntity<>(new ApiResponse(null, "1", ex.getMessage()), HttpStatus.NOT_FOUND);
     }
 
@@ -29,13 +29,13 @@ import java.util.logging.Logger;
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ApiResponse> handleUnauthorizedException(UnauthorizedException ex) {
-        logger.log(Level.WARNING, "Unauthorized Access to API", ex);
+        logger.log(Level.WARNING, ex.getMessage());
         return new ResponseEntity<>(new ApiResponse(null, "3", ex.getMessage()), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiResponse> handleBadRequestException(BadRequestException ex) {
-        logger.log(Level.SEVERE, "Request was invalid", ex);
+        logger.log(Level.WARNING, ex.getMessage());
         return new ResponseEntity<>(new ApiResponse(null, "4", ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }

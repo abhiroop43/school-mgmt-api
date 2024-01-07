@@ -2,14 +2,18 @@ package dev.abhiroopsantra.schoolmgmtapi.services.admin;
 
 import dev.abhiroopsantra.schoolmgmtapi.dto.FeeDto;
 import dev.abhiroopsantra.schoolmgmtapi.dto.StudentLeaveDto;
+import dev.abhiroopsantra.schoolmgmtapi.dto.TeacherDto;
 import dev.abhiroopsantra.schoolmgmtapi.dto.UserDto;
 import dev.abhiroopsantra.schoolmgmtapi.entities.Fee;
 import dev.abhiroopsantra.schoolmgmtapi.entities.StudentLeave;
+import dev.abhiroopsantra.schoolmgmtapi.entities.Teacher;
 import dev.abhiroopsantra.schoolmgmtapi.entities.User;
 import dev.abhiroopsantra.schoolmgmtapi.enums.StudentLeaveStatus;
 import dev.abhiroopsantra.schoolmgmtapi.enums.UserRole;
+import dev.abhiroopsantra.schoolmgmtapi.exceptions.NotFoundException;
 import dev.abhiroopsantra.schoolmgmtapi.repositories.FeeRepository;
 import dev.abhiroopsantra.schoolmgmtapi.repositories.StudentLeaveRepository;
+import dev.abhiroopsantra.schoolmgmtapi.repositories.TeacherRepository;
 import dev.abhiroopsantra.schoolmgmtapi.repositories.UserRepository;
 import jakarta.annotation.PostConstruct;
 import org.modelmapper.ModelMapper;
@@ -30,16 +34,18 @@ import java.util.Optional;
     private final ModelMapper            modelMapper;
     private final FeeRepository          feeRepository;
     private final StudentLeaveRepository studentLeaveRepository;
+    private final TeacherRepository      teacherRepository;
 
     public AdminServiceImpl(
             UserRepository userRepository, Environment env, ModelMapper modelMapper, FeeRepository feeRepository,
-            StudentLeaveRepository studentLeaveRepository
+            StudentLeaveRepository studentLeaveRepository, TeacherRepository teacherRepository
                            ) {
         this.userRepository         = userRepository;
         this.env                    = env;
         this.modelMapper            = modelMapper;
         this.feeRepository          = feeRepository;
         this.studentLeaveRepository = studentLeaveRepository;
+        this.teacherRepository      = teacherRepository;
     }
 
     @PostConstruct public void createAdminAccount() {
@@ -178,5 +184,68 @@ import java.util.Optional;
         Page<StudentLeave> leaves = studentLeaveRepository.findAll(pageable);
 
         return leaves.map(leave -> modelMapper.map(leave, StudentLeaveDto.class));
+    }
+
+    @Override public TeacherDto postTeacher(TeacherDto teacherDto) {
+        Teacher teacher = modelMapper.map(teacherDto, Teacher.class);
+        teacher.setIsActive(true);
+        teacher.setCreatedAt(new Date());
+        teacher.setCreatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        Teacher createdTeacher = teacherRepository.save(teacher);
+        return modelMapper.map(createdTeacher, TeacherDto.class);
+    }
+
+    @Override public Page<TeacherDto> getTeachers(Pageable pageable) {
+        // list only active teachers
+        Page<Teacher> teachers = teacherRepository.findByIsActive(true, pageable);
+
+        return teachers.map(teacher -> modelMapper.map(teacher, TeacherDto.class));
+    }
+
+    @Override public Boolean deleteTeacher(Long id) {
+        Optional<Teacher> teacher = teacherRepository.findById(id);
+
+        if (teacher.isEmpty()) {
+            return false;
+        }
+
+        // soft delete the teacher
+        Teacher teacher1 = teacher.get();
+        teacher1.setIsActive(false);
+        teacher1.setUpdatedAt(new Date());
+        teacher1.setUpdatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        teacherRepository.save(teacher1);
+
+        return true;
+    }
+
+    @Override public TeacherDto getTeacherById(Long id) {
+        Optional<Teacher> teacher = teacherRepository.findById(id);
+        return teacher.map(value -> modelMapper.map(value, TeacherDto.class)).orElse(null);
+    }
+
+    @Override public TeacherDto updateTeacher(Long id, TeacherDto teacherDto) {
+        Optional<Teacher> teacher = teacherRepository.findById(id);
+
+        if (teacher.isEmpty()) {
+            throw new NotFoundException("Unable to find teacher with id " + id);
+        }
+
+        Teacher teacherData = teacher.get();
+
+        // we only allow updating the following fields of the teacher
+        teacherData.setName(teacherDto.getName());
+        teacherData.setAddress(teacherDto.getAddress());
+        teacherData.setDepartment(teacherDto.getDepartment());
+        teacherData.setDateOfBirth(teacherDto.getDateOfBirth());
+        teacherData.setIsActive(true);
+
+        teacherData.setUpdatedAt(new Date());
+        teacherData.setUpdatedBy(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        Teacher updatedTeacher = teacherRepository.save(teacherData);
+        return modelMapper.map(updatedTeacher, TeacherDto.class);
     }
 }

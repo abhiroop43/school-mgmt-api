@@ -1,9 +1,6 @@
 package dev.abhiroopsantra.schoolmgmtapi.controllers;
 
-import dev.abhiroopsantra.schoolmgmtapi.dto.ApiResponse;
-import dev.abhiroopsantra.schoolmgmtapi.dto.FeeDto;
-import dev.abhiroopsantra.schoolmgmtapi.dto.StudentLeaveDto;
-import dev.abhiroopsantra.schoolmgmtapi.dto.UserDto;
+import dev.abhiroopsantra.schoolmgmtapi.dto.*;
 import dev.abhiroopsantra.schoolmgmtapi.enums.StudentLeaveStatus;
 import dev.abhiroopsantra.schoolmgmtapi.exceptions.BadRequestException;
 import dev.abhiroopsantra.schoolmgmtapi.exceptions.NotFoundException;
@@ -142,5 +139,76 @@ import java.util.HashMap;
             throw new BadRequestException("Unable to update leave status");
         }
         return new ResponseEntity<>(new ApiResponse(null, "0", "Leave status updated successfully"), HttpStatus.OK);
+    }
+
+    // api method to create new teacher
+    @PostMapping("/teachers") public ResponseEntity<ApiResponse> addTeacher(@RequestBody TeacherDto teacherDto) {
+        TeacherDto createdTeacher = adminService.postTeacher(teacherDto);
+        if (createdTeacher == null) {
+            throw new BadRequestException("Unable to create teacher");
+        }
+
+        HashMap<String, Object> responseData = new HashMap<>();
+        responseData.put("teacher", createdTeacher);
+        return new ResponseEntity<>(
+                new ApiResponse(responseData, "0", "Teacher created successfully"), HttpStatus.CREATED);
+
+    }
+
+    // api method to get list of teachers
+    @GetMapping("/teachers") public ResponseEntity<ApiResponse> getTeachersList(Pageable pageable) {
+        Page<TeacherDto>        teachers     = adminService.getTeachers(pageable);
+        HashMap<String, Object> responseData = new HashMap<>();
+        responseData.put("teachers", teachers.getContent());
+        responseData.put("currentPage", teachers.getNumber());
+        responseData.put("totalItems", teachers.getTotalElements());
+        responseData.put("totalPages", teachers.getTotalPages());
+
+        return new ResponseEntity<>(new ApiResponse(responseData, "0", "Teachers fetched successfully"), HttpStatus.OK);
+    }
+
+    // api method to get a specific teacher by id
+    @GetMapping("/teachers/{id}") public ResponseEntity<ApiResponse> getTeacherById(@PathVariable("id") Long id) {
+
+        TeacherDto teacher = adminService.getTeacherById(id);
+
+        if (teacher == null) {
+            throw new NotFoundException("Unable to find teacher with id " + id);
+        }
+
+        HashMap<String, Object> responseData = new HashMap<>();
+        responseData.put("teacher", teacher);
+
+        return new ResponseEntity<>(new ApiResponse(responseData, "0", "Teacher fetched successfully"), HttpStatus.OK);
+    }
+
+    // api method to update a teacher
+    @PutMapping("/teachers/{id}") public ResponseEntity<ApiResponse> updateTeacher(
+            @PathVariable("id") Long id, @RequestBody TeacherDto teacherDto
+                                                                                  ) {
+        TeacherDto updatedTeacher = adminService.updateTeacher(id, teacherDto);
+
+        if (updatedTeacher == null) {
+            throw new BadRequestException("Unable to update teacher");
+        }
+
+        HashMap<String, Object> responseData = new HashMap<>();
+        responseData.put("teacher", updatedTeacher);
+
+        return new ResponseEntity<>(new ApiResponse(responseData, "0", "Teacher updated successfully"), HttpStatus.OK);
+    }
+
+    // api method to delete a teacher by id
+    @DeleteMapping("/teachers/{id}") public ResponseEntity<ApiResponse> deleteTeacher(@PathVariable("id") Long id) {
+        Boolean isDeleted = adminService.deleteTeacher(id);
+
+        if (!isDeleted) {
+            throw new BadRequestException("Unable to delete teacher");
+        }
+
+        HashMap<String, Object> responseData = new HashMap<>();
+        responseData.put("isDeleted", true);
+
+        return new ResponseEntity<>(new ApiResponse(responseData, "0", "Teacher deleted successfully"), HttpStatus.OK);
     }
 }
